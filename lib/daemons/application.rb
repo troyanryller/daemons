@@ -31,7 +31,7 @@ module Daemons
       ['dir', 'log_dir', 'logfilename', 'output_logfilename'].each do |k|
         @options[k] = File.expand_path(@options[k]) if @options.key?(k)
       end
-        
+
       @dir_mode = @dir = @script = nil
 
       @force_kill_waittime = @options[:force_kill_waittime] || 20
@@ -336,7 +336,12 @@ module Daemons
 
       require 'logger'
 
-      l_file = Logger.new(logfile)
+      l_file =
+        if options[:log_file_size_bytes] && options[:log_file_files_count]
+          Logger.new(logfile, options[:log_file_files_count].to_i, options[:log_file_size_bytes].to_i)
+        else
+          Logger.new(logfile)
+        end
 
       # the code below finds the last exception
       e = nil
